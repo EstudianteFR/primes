@@ -19,7 +19,6 @@ public class Main {
 
         long time = primesBetween(start, end);
 
-
     }
 
     /**
@@ -64,8 +63,10 @@ public class Main {
                 counter++;
             }
         }
+        long time = sw.getTime(TimeUnit.MILLISECONDS);
         log.debug("Between {} and {}, the number of primes is: {}", ini, end, counter);
-        return sw.getTime(TimeUnit.MILLISECONDS);
+        log.debug("Running time: {} milliseconds", time);
+        return time;
     }
 
 }
