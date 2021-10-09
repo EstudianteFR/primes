@@ -3,6 +3,9 @@ package cl.ucn.disc.hpc.primes;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -17,8 +20,8 @@ public class Main {
         final long start = 2;
         final long end = 2 * 100 * 1000;
 
-        long time = primesBetween(start, end);
-
+        int N = 5;
+        runningAverageTime(N, start, end);
     }
 
     /**
@@ -69,4 +72,32 @@ public class Main {
         return time;
     }
 
+    /**
+     * 
+     * @param N of computations of primesBetween
+     * @param start bound
+     * @param end bound
+     * @return average time
+     */
+    private static double runningAverageTime(int N, long start, long end) {
+        List<Long> times = new ArrayList<>(N);
+
+        for (int i = 0; i < N; i++) {
+            long time = primesBetween(start, end);
+            times.add(time);
+
+        }
+
+        // Remove the min
+        long min = Collections.min(times);
+        times.remove(min);
+
+        // Remove the max
+        long max = Collections.max(times);
+        times.remove(max);
+
+        var average = times.stream().mapToLong(n -> n).average().getAsDouble();
+        log.debug("The average time is: {} milliseconds", average);
+        return average;
+    }
 }
