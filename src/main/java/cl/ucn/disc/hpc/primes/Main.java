@@ -10,13 +10,15 @@ public class Main {
 
     public static void main(String[] args) {
 
-        //Stopwatch
-        StopWatch sw = StopWatch.createStarted();
         log.debug("Starting the program");
-        long n = 87178291199L;
-        log.debug("{} isPrime: {}", n, isPrime(n));
 
-        log.info("Done in {}.", sw.getTime(TimeUnit.MILLISECONDS));
+
+
+        final long start = 2;
+        final long end = 2 * 100 * 1000;
+
+        long time = primesBetween(start, end);
+
 
     }
 
@@ -43,6 +45,27 @@ public class Main {
         }
 
         return true;
+    }
+
+    /**
+     * Compute the number of primes between two numbers
+     * @param ini bound
+     * @param end bound
+     * @return running time
+     */
+    private static long primesBetween(long ini, long end) {
+
+        //Stopwatch
+        StopWatch sw = StopWatch.createStarted();
+
+        long counter = 0;
+        for (long n = ini; n <= end; n++) {
+            if (isPrime(n)){
+                counter++;
+            }
+        }
+        log.debug("Between {} and {}, the number of primes is: {}", ini, end, counter);
+        return sw.getTime(TimeUnit.MILLISECONDS);
     }
 
 }
