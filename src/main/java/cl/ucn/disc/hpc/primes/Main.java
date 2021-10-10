@@ -6,22 +6,28 @@ import org.apache.commons.lang3.time.StopWatch;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class Main {
 
-    public static void main(String[] args) {
+    private static int counter = 0;
+    private static final Boolean CRITICAL_ZONE = Boolean.TRUE;
+
+    public static void main(String[] args) throws InterruptedException {
 
         log.debug("Starting the program");
+        parallel();
 
-
-
+        /*
         final long start = 2;
         final long end = 5 * 10 * 100 * 1000;
 
         int N = 12;
-        runningAverageTime(N, start, end);
+        runningAverageTime(N, start, end);*/
     }
 
     /**
@@ -107,5 +113,42 @@ public class Main {
         var average = times.stream().mapToLong(n -> n).average().getAsDouble();
         log.debug("The average time is: {} milliseconds", average);
         return average;
+    }
+
+    public static void parallel() throws InterruptedException {
+
+        StopWatch sw = StopWatch.createStarted();
+
+        final int start = 2;
+        final int end = 5 * 10 * 100 * 10000;
+
+        final int maxCores = Runtime.getRuntime().availableProcessors();
+        log.debug("The max cores: {}", maxCores);
+        log.info("Finding primes from {} to {} using {} cores.", start, end, maxCores);
+
+        final ExecutorService executor = Executors.newFixedThreadPool(maxCores);
+
+        for (int i = start; i <= end; i++) {
+            final int n = i;
+            executor.submit( () -> {
+                if (isPrime(n)) {
+                    synchronized (CRITICAL_ZONE){
+                        counter++;
+                    }
+                }
+            } );
+        }
+
+
+        executor.shutdown();
+        int maxTime = 5;
+
+        if (executor.awaitTermination(5, TimeUnit.MINUTES)) {
+            log.debug("Founded {} primes in {} milliseconds", counter, sw.getTime(TimeUnit.MILLISECONDS));
+        } else {
+            log.warn("The executor has not finished in {} minutes", maxTime);
+        }
+
+
     }
 }
