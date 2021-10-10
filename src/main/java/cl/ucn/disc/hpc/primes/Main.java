@@ -18,9 +18,9 @@ public class Main {
 
 
         final long start = 2;
-        final long end = 2 * 100 * 1000;
+        final long end = 5 * 10 * 100 * 1000;
 
-        int N = 5;
+        int N = 12;
         runningAverageTime(N, start, end);
     }
 
@@ -39,7 +39,15 @@ public class Main {
             return false;
         }
 
-        for (long i= 2; i < n; i++) {
+        if (n==2) {
+            return true;
+        }
+
+        if (n % 2 == 0) {
+            return false;
+        }
+
+        for (long i= 3; i*i <= n; i += 2) {
 
             if (n % i == 0 ) {
                 return false;
