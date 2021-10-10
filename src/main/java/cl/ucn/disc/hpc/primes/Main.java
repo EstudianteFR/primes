@@ -116,9 +116,7 @@ public class Main {
     }
 
     public static void parallel() throws InterruptedException {
-
-        StopWatch sw = StopWatch.createStarted();
-
+        
         final int start = 2;
         final int end = 5 * 10 * 100 * 1000;
 
@@ -126,10 +124,21 @@ public class Main {
         log.debug("The max cores: {}", maxCores);
         log.info("Finding primes from {} to {} using {} cores.", start, end, maxCores);
 
-        final ExecutorService executor = Executors.newFixedThreadPool(maxCores);
+        for (int i = 1; i <= maxCores; i++) {
+            counter.set(0);
+            long time = findPrimesParallel(start, end, i);
 
-        for (int i = start; i <= end; i++) {
-            final int n = i;
+            log.info("Time with {} cores: {} miliseconds", i, time);
+        }
+
+    }
+
+    private static long findPrimesParallel(long ini, long end, int cores) throws InterruptedException {
+        final ExecutorService executor = Executors.newFixedThreadPool(cores);
+        StopWatch sw = StopWatch.createStarted();
+        
+        for (long i = ini; i <= end; i++) {
+            final long n = i;
             executor.submit( () -> {
                 if (isPrime(n)) {
                     counter.getAndIncrement();
@@ -142,11 +151,13 @@ public class Main {
         int maxTime = 5;
 
         if (executor.awaitTermination(5, TimeUnit.MINUTES)) {
-            log.debug("Founded {} primes in {} milliseconds", counter, sw.getTime(TimeUnit.MILLISECONDS));
+            long time = sw.getTime(TimeUnit.MILLISECONDS);
+            log.debug("Founded {} primes in {} milliseconds", counter, time);
+            return time;
         } else {
             log.warn("The executor has not finished in {} minutes", maxTime);
         }
-
-
+        
+        throw new RuntimeException("The computation didn't finish");
     }
 }
