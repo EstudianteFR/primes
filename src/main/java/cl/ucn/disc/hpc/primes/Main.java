@@ -6,7 +6,6 @@ import org.apache.commons.lang3.time.StopWatch;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -22,12 +21,6 @@ public class Main {
         log.debug("Starting the program");
         parallel();
 
-        /*
-        final long start = 2;
-        final long end = 5 * 10 * 100 * 1000;
-
-        int N = 12;
-        runningAverageTime(N, start, end);*/
     }
 
     /**
@@ -86,49 +79,37 @@ public class Main {
         return time;
     }
 
-    /**
-     * 
-     * @param N of computations of primesBetween
-     * @param start bound
-     * @param end bound
-     * @return average time
-     */
-    private static double runningAverageTime(int N, long start, long end) {
-        List<Long> times = new ArrayList<>(N);
-
-        for (int i = 0; i < N; i++) {
-            long time = primesBetween(start, end);
-            times.add(time);
-
-        }
-
-        // Remove the min
-        long min = Collections.min(times);
-        times.remove(min);
-
-        // Remove the max
-        long max = Collections.max(times);
-        times.remove(max);
-
-        var average = times.stream().mapToLong(n -> n).average().getAsDouble();
-        log.debug("The average time is: {} milliseconds", average);
-        return average;
-    }
-
     public static void parallel() throws InterruptedException {
         
         final int start = 2;
         final int end = 5 * 10 * 100 * 1000;
 
-        final int maxCores = Runtime.getRuntime().availableProcessors();
+        // Max cores plus 1
+        final int maxCores = Runtime.getRuntime().availableProcessors() * 2;
         log.debug("The max cores: {}", maxCores);
         log.info("Finding primes from {} to {} using {} cores.", start, end, maxCores);
 
-        for (int i = 1; i <= maxCores; i++) {
-            counter.set(0);
-            long time = findPrimesParallel(start, end, i);
 
-            log.info("Time with {} cores: {} miliseconds", i, time);
+        for (int j = 1; j <= maxCores; j++) {
+            List<Long> times = new ArrayList<>(10);
+            for (int i = 0; i < 20; i++) {
+
+                counter.set(0);
+                long time = findPrimesParallel(start, end, j);
+                times.add(time);
+                //log.info("Time with {} cores: {} milliseconds", j, time);
+
+            }
+            // Remove the min
+            long min = Collections.min(times);
+            times.remove(min);
+
+            // Remove the max
+            long max = Collections.max(times);
+            times.remove(max);
+
+            var average = times.stream().mapToLong(n -> n).average().getAsDouble();
+            log.debug("The average time with {} cores is: {} milliseconds", j, average);
         }
 
     }
@@ -152,7 +133,7 @@ public class Main {
 
         if (executor.awaitTermination(5, TimeUnit.MINUTES)) {
             long time = sw.getTime(TimeUnit.MILLISECONDS);
-            log.debug("Founded {} primes in {} milliseconds", counter, time);
+            //log.debug("Founded {} primes in {} milliseconds", counter, time);
             return time;
         } else {
             log.warn("The executor has not finished in {} minutes", maxTime);
