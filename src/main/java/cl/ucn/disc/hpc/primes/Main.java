@@ -1,3 +1,26 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2021 Fabian Rojas
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package cl.ucn.disc.hpc.primes;
 
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class Main {
 
+    // Counter with lock capacity
     private static final AtomicInteger counter = new AtomicInteger(0);
 
     public static void main(String[] args) throws InterruptedException {
@@ -79,6 +103,10 @@ public class Main {
         return time;
     }
 
+    /**
+     * For each core, compute the time that took it to count prime numbers between 2 and 5000000.
+     * @throws InterruptedException
+     */
     public static void parallel() throws InterruptedException {
         
         final int start = 2;
@@ -114,6 +142,14 @@ public class Main {
 
     }
 
+    /**
+     * Count prime numbers between 2 numbers, with n amount of cores
+     * @param ini - lower bound
+     * @param end - higher bound
+     * @param cores - cores to use
+     * @return time spent
+     * @throws InterruptedException if the job is in loop
+     */
     private static long findPrimesParallel(long ini, long end, int cores) throws InterruptedException {
         final ExecutorService executor = Executors.newFixedThreadPool(cores);
         StopWatch sw = StopWatch.createStarted();
